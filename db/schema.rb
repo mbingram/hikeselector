@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_05_164538) do
+ActiveRecord::Schema.define(version: 2021_01_06_223225) do
 
   create_table "hikes", force: :cascade do |t|
     t.string "name"
@@ -21,4 +21,18 @@ ActiveRecord::Schema.define(version: 2021_01_05_164538) do
     t.string "difficulty"
   end
 
+  create_table "userhikes", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "hike_id"
+    t.index ["hike_id"], name: "index_userhikes_on_hike_id"
+    t.index ["user_id"], name: "index_userhikes_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username"
+    t.string "password_string"
+  end
+
+  add_foreign_key "userhikes", "hikes"
+  add_foreign_key "userhikes", "users"
 end

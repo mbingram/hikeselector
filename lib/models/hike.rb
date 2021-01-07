@@ -1,5 +1,7 @@
 class Hike < ActiveRecord::Base
     # choices = ["Location", "Dog Friendly?", "Elevation Gain", "Difficulty", "Distance"]
+    has_many :userhikes
+    has_many :users, through: :userhikes
 
     def self.dog_friendly?
         self.where("dog_friendly = ?", true)

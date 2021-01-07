@@ -10,8 +10,43 @@ class Cli
     def welcome
         clear
         puts "Welcome to HikeSelector!"
-        name = prompt.ask("What is your name?")
-        puts "Hi #{name}!"
+        login
+    end
+
+    def login
+        username = prompt.ask("What is your username?")
+        puts "Hi #{username}!"
+        password = prompt.ask("What is your password?")
+        @user = User.check_if_exist(username)
+        if @user
+            if @user.validate_password(password)
+                find_or_favorite
+            else
+                puts "Oops! Wrong password."
+                login
+            end
+        else
+            puts "User not found, would you like to create an account?"
+            @user = new_user
+            find_or_favorite
+        end 
+    end
+
+    def new_user
+        username = prompt.ask("What is your username?")
+        password = prompt.ask("What is your password?")
+        User.create username: username, password_string: password
+    end
+
+    def find_or_favorite
+        choices = ["Look for a hike.", "View favorites."]
+        answer = prompt.select("Would you like to look for a hike, or view favorites?", choices)
+        if answer == "Look for a hike."
+            invitation
+        else
+            puts @user.favorite_hikes
+        end
+
     end
 
     def invitation
@@ -37,6 +72,17 @@ class Cli
         hike = prompt.select("Select a hike to view more details:", hikes.pluck(:name))
         hike = Hike.find_by(name: hike)
         puts "NAME: #{hike.name}\nLOCATION: #{hike.location}\nDOG FRIENDLY?: #{hike.dog_friendly}\nDISTANCE: #{hike.distance}\nELEVATION GAIN: #{hike.elevation}\nDIFFICULTY: #{hike.difficulty}"
+        add_to_favorites(hike)
+    end
+
+    def add_to_favorites hike
+        answer = prompt.yes?("Would you like to add this hike to your favorites?")
+        if answer
+            Userhike.create(user_id: @user.id, hike_id: hike.id)
+            puts "You have added a favorite!"
+        else 
+            continue_or_exit
+        end        
     end
 
     def list_hikes
