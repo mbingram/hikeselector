@@ -4,13 +4,18 @@ ActiveRecord::Base.logger = nil
 class Cli
     
     def prompt
-        prompt = TTY::Prompt.new
+        prompt = TTY::Prompt.new(symbols: {marker: "🏔"})
     end
 
     def welcome
         clear
         puts "Welcome to HikeSelector!"
         login
+    end
+
+    def exit_app
+        clear
+        exit
     end
 
     def login
@@ -53,7 +58,7 @@ class Cli
         choices = ["Edit my favorites", "Look for another hike", "Exit"]
         answer = prompt.select("What would you like to do now?", choices)
         if answer == "Exit"
-            exit
+            exit_app
         elsif answer == "Look for another hike"
             clear
             invitation
@@ -70,14 +75,19 @@ class Cli
             userhike.destroy
         end
         display_favorites
+        continue_or_exit
     end
 
     def display_favorites
+        @user.reload
+        clear
         puts "These are your favorite hikes:"
         puts @user.favorite_hikes
+
     end
 
     def invitation
+        clear
         choices = ["Location", "Dog Friendly?", "Elevation Gain", "Difficulty", "Distance"]
         answer = prompt.select("How would you like to search for a hike?", choices)
         hikes = filter_hikes(answer)
@@ -86,10 +96,13 @@ class Cli
     end
 
     def continue_or_exit
-        choices = ["Look for another hike", "Exit"]
+        choices = ["Look for another hike", "View favorites", "Exit"]
         answer = prompt.select("Would you like to look for another hike or exit?", choices)
         if answer == "Exit"
-            exit
+            exit_app
+        elsif answer == "View favorites"
+            display_favorites
+            edit_or_continue_or_exit
         else
             clear
             invitation
