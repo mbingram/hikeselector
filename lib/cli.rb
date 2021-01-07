@@ -2,14 +2,34 @@ require 'tty-prompt'
 ActiveRecord::Base.logger = nil
 
 class Cli
+
+    def intialize(user = nil)
+        @user = user
+    end
     
     def prompt
         prompt = TTY::Prompt.new(symbols: {marker: "🏔"})
     end
+    
+    def font
+        font = TTY::Font.new(:straight)
+    end
+
+    def view_spinner
+        spinner = TTY::Spinner.new("[:spinner] Loading ...", format: :pulse_2)
+        spinner.auto_spin # Automatic animation with default interval
+        sleep(2) # Perform task
+        spinner.stop("Done!")
+    end
 
     def welcome
         clear
-        puts "Welcome to HikeSelector!"
+        box = TTY::Box.frame(width: 55, height: 5, align: :center, title: {top_left: "Welcome to", bottom_right: "v1.0"}) do 
+            font.write("HIKE SELECTOR")
+        end
+        view_spinner
+        puts box
+        puts "The only hiking app you'll ever need again. EVER. Maybe.".colorize(:blue)
         login
     end
 
@@ -31,7 +51,7 @@ class Cli
                 login
             end
         else
-            puts "User not found, would you like to create an account?"
+            puts "User not found, create an account:"
             @user = new_user
             find_or_favorite
         end 
