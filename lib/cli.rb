@@ -88,14 +88,19 @@ class Cli
     end
 
     def edit_favorites
-        selected_hikes = prompt.multi_select("Which favorites would you like to remove?", @user.favorite_hikes)
-        selected_hikes.map do |selected_hike|
-            hike_id = Hike.find_by(name: selected_hike).id
-            userhike = Userhike.find_by(hike_id: hike_id, user_id: @user.id)
-            userhike.destroy
-        end
-        display_favorites
-        continue_or_exit
+        if @user.favorite_hikes.any?
+            selected_hikes = prompt.multi_select("Which favorites would you like to remove?", @user.favorite_hikes)
+            selected_hikes.map do |selected_hike|
+                hike_id = Hike.find_by(name: selected_hike).id
+                userhike = Userhike.find_by(hike_id: hike_id, user_id: @user.id)
+                userhike.destroy
+            end
+            display_favorites
+            continue_or_exit
+        else
+            puts "You don't have any favorites yet. Go find some!"
+            continue_or_exit
+        end    
     end
 
     def display_favorites
