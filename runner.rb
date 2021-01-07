@@ -10,4 +10,6 @@ app.welcome
 
 
 #navigate back to hikes list from adding favorite
+#delete a favorite
+#fix navigation after adding a favorite
 

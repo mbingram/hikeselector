@@ -44,9 +44,37 @@ class Cli
         if answer == "Look for a hike."
             invitation
         else
-            puts @user.favorite_hikes
+            display_favorites
+            edit_or_continue_or_exit
         end
+    end
 
+    def edit_or_continue_or_exit
+        choices = ["Edit my favorites", "Look for another hike", "Exit"]
+        answer = prompt.select("What would you like to do now?", choices)
+        if answer == "Exit"
+            exit
+        elsif answer == "Look for another hike"
+            clear
+            invitation
+        else
+            edit_favorites
+        end
+    end
+
+    def edit_favorites
+        selected_hikes = prompt.multi_select("Which favorites would you like to remove?", @user.favorite_hikes)
+        selected_hikes.map do |selected_hike|
+            hike_id = Hike.find_by(name: selected_hike).id
+            userhike = Userhike.find_by(hike_id: hike_id, user_id: @user.id)
+            userhike.destroy
+        end
+        display_favorites
+    end
+
+    def display_favorites
+        puts "These are your favorite hikes:"
+        puts @user.favorite_hikes
     end
 
     def invitation
